@@ -1,0 +1,548 @@
+<!-- Created by Oceanlight -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snake Game</title>
+    <style>
+        body {
+            text-align:center;
+        }
+        button {
+            width:70px;
+            height:50px;
+            background-color: #050cef;
+            border-radius:10px;
+            color:#FFFFFF;
+            text-align: center;
+            font-size: 17px;
+        }
+        button {
+          box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        }
+        p {
+           font-size:20px;
+           font-family: fantasy;
+           margin:0px;
+        }
+        table {
+            border:solid 10px black;
+            border-radius:30px;
+            padding:10px;
+            color:red;
+        }
+        .first {
+          transform: translate(-15%, -45%);
+          margin-bottom:-20px;
+          display: inline-block;
+        }
+        .mid {
+          margin-bottom:-15px;
+          margin-top:-10px;
+          display: inline-block;
+        }
+        .last {
+            transform: translate(15%, -45%);
+           margin-bottom:-20px;
+           display: inline-block;
+        }
+        .AP {
+            position: absolute;
+            width: 300px;
+            height: 115px;
+            left: 64px;
+            top: 265px;
+            display:inline-block;
+        }
+    </style>
+</head>
+<body id="Bodys">
+    <!-- add this to body tag to disable scrolling:
+    scroll="no" style="overflow: hidden" -->
+        <table id=Table>
+        <tr>
+            <th>
+                <canvas id="canvas" width="370" height="300" ></canvas>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <button id="up" onclick="up()" style="margin-bottom:20px">Up</button><br />
+                <button class="first" id="left" onclick="left()" style="margin-right:0px">Left</button>
+                <img class="mid" src="https://1.bp.blogspot.com/-qqUxJnW2wKQ/XgIuj7jr20I/AAAAAAAAADY/0uGsP72a6ngSUPjOrxGImH3qEtaG9jkGgCLcBGAsYHQ/s1600/VenomOcean.png" width="200px">
+                <button class="last" id="right" onclick="right()" style="margin-left:0px">Right</button><br />
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <button id="down" onclick="down()" style="margin-top:20px">Down</button>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <p id="highScore">(OLYCS)</p>
+            </th>
+        </tr>
+    </table>
+    <script src="https://code.jquery.com/jquery-2.1.0.js"></script>
+    
+    <script>
+        
+        // to clear localStorage
+        // localStorage.removeItem("highScore");
+        
+            var highScore = 0;
+            // if a list is stored
+            if (localStorage.highScore) {
+                highScore = parseInt(localStorage.highScore);
+                document.getElementById("highScore").innerHTML="High Score : "+ highScore;
+            }
+            
+            
+            let P=document.createElement("p");
+                P.innerHTML="Try Again";
+                P.style.width="200px";
+                P.style.height="40px"
+                P.style.fontSize="30px";
+                P.style.fontFamily="fantasy";
+                P.style.position="absolute";
+                P.style.display="inline-block";
+                P.style.left="113px";
+                P.style.top="413px";
+                P.style.color="#ffffff";
+                P.style.border="solid 3px green";
+                P.style.borderRadius="50%";
+                P.style.backgroundColor="rgb(38,38,38)";
+                P.style.userSelect="none";
+                P.onclick=newGame;
+            // Easy button
+            let Radio=document.createElement("input");
+                Radio.type="radio";
+                Radio.name="Speed";
+                Radio.value="1";
+                Radio.style.width="50px";
+                Radio.style.height="25px"
+                Radio.style.fontSize="5px";
+                Radio.style.position="absolute";
+                Radio.style.display="inline-block";
+                Radio.style.left="120px";
+                Radio.style.top="620px";
+                Radio.style.border="10px";
+            // Medium button
+            let Radio1=document.createElement("input");
+                Radio1.style.cssText=Radio.style.cssText;
+                Radio1.type="radio";
+                Radio1.name="Speed";
+                Radio1.value="2";
+                Radio1.checked=true;
+                Radio1.style.top="650px";
+            // Hard button
+            let Radio2=document.createElement("input");
+                Radio2.style.cssText=Radio.style.cssText;
+                Radio2.type="radio";
+                Radio2.name="Speed";
+                Radio2.value="3";
+                Radio2.style.top="680px";
+            // Easy selector
+            let Mode=document.createElement("p");
+                Mode.style.cssText=P.style.cssText;
+                Mode.innerHTML="Easy";
+                Mode.style.width="100px";
+                Mode.style.height="30px"
+                Mode.style.fontSize="25px";
+                Mode.style.fontFamily="Consolas, monaco, monospace";
+                Mode.style.left="170px";
+                Mode.style.top="620px";
+                Mode.style.color="#0000FF";
+                Mode.style.border="none";
+                Mode.style.backgroundColor="white";
+            // Normal selector
+            let Mode1=document.createElement("p");
+                Mode1.style.cssText=Mode.style.cssText;
+                Mode1.innerHTML="Normal";
+                Mode1.style.top="650px";
+            // Hard selector
+            let Mode2=document.createElement("p");
+                Mode2.style.cssText=Mode.style.cssText;
+                Mode2.innerHTML="Hard";
+                Mode2.style.top="680px";
+            // Speed icon
+            let Speed=document.createElement("p");
+                Speed.style.cssText=Mode.style.cssText;
+                Speed.style.fontSize="30px"
+                Speed.innerHTML="Speed :";
+                Speed.style.top="590px";
+                Speed.style.left="10px";
+                Speed.style.width="140px";
+                
+        // Button event handlers
+            let up = function () {
+                snake.setDirection("up")
+            }
+        
+            let left = function () {
+                snake.setDirection("left")
+            }
+
+            let right = function () {
+                snake.setDirection("right")
+            }
+
+            let down = function () {
+                snake.setDirection("down")
+            }
+        
+    
+        // Set up canvas
+        let canvas = document.getElementById("canvas")
+        let ctx = canvas.getContext("2d")
+        
+        // Get width and height of canvas element
+        let width = canvas.width
+        let height = canvas.height
+        
+        // Work out the width and height in blocks
+        let blockSize = 10
+        let widthInBlocks = width / blockSize
+        let heightInBlocks = height / blockSize
+        
+        // Set score to 0
+        var score = 0
+        
+        // Set the starting score for the background change easter egg
+        let kEasterEgg = 15
+        
+        let backgroundChange = function () {
+            // Day to night color gradient array
+            let sunset = ["GhostWhite", "Lavender", "Thistle", "MediumPurple", "SlateBlue", "DarkSlateBlue", "DarkBlue", "MidnightBlue"]
+            
+            // Night to day color gradient array
+            let sunrise = ["MidnightBlue", "DarkBlue", "DarkSlateBlue", "SlateBlue", "MediumPurple", "Thistle", "Lavender", "GhostWhite"]
+            
+            // This is an easter egg (activated in the drawBorder function between score === 15 and 30)
+            // Every time an apple is eaten the 'sunset' progresses by one color, changing the background of the game
+            if (score <= kEasterEgg + 7) {
+                ctx.fillStyle = sunset[score - kEasterEgg]
+                ctx.fillRect(0, 0, width, height)
+                // When the player reaches 23, the 'sunrise' progresses every time an apple is eaten
+            } else if (score >= kEasterEgg + 8) {
+                ctx.fillStyle = sunrise[score - (kEasterEgg + 8)]
+                ctx.fillRect(0, 0, width, height)
+            }
+        }
+        
+        
+        
+        // Draw a border
+        let drawBorder = function () {
+            // When score is between 15 and 30, activate the background change
+            if (score >= kEasterEgg && score <= kEasterEgg + 15) {
+                backgroundChange()
+            }
+
+            // Draw a 10px thick border
+            ctx.fillStyle = "Gray"
+            ctx.fillRect(0, 0, width, blockSize)
+            ctx.fillRect(0, height - blockSize, width, blockSize)
+            ctx.fillStyle = "DarkGray"
+            ctx.fillRect(0, 0, blockSize, height)
+            ctx.fillRect(width - blockSize, 0, blockSize, height)
+        }
+    
+        // Draw the current score in top-left corner of canvas
+        let drawScore = function () {
+            ctx.font = "20px Courier"
+            ctx.fillStyle = "Black"
+            // set the aligning coordinates to top left corner of text
+            ctx.textAlign = "left"
+            ctx.textBaseline = "top"
+            ctx.fillText("Score: " + score, blockSize, blockSize)
+        }
+    
+        // Clear interval and draw "Game Over" in center of canvas
+        let gameOver = function () {
+            
+            // Set collided to true so that the gameLoop stops being called
+            collided = true
+            
+            ctx.font = "60px Courier"
+            ctx.fillStyle = "Black"
+            // set the aligning coordinates to the center of text
+            ctx.textAlign = "center"
+            ctx.textBaseline = "middle"
+            // display the game over text
+            ctx.fillText("Game Over", width / 2, height / 2)
+            
+            // display difficulty selectors
+            document.getElementById("Table").appendChild(P);
+            document.getElementById("Bodys").appendChild(Radio);
+            document.getElementById("Bodys").appendChild(Radio1);
+            document.getElementById("Bodys").appendChild(Radio2);
+            document.getElementById("Bodys").appendChild(Mode);
+            document.getElementById("Bodys").appendChild(Mode1);
+            document.getElementById("Bodys").appendChild(Mode2);
+            document.getElementById("Bodys").appendChild(Speed);
+        }
+        
+        // To draw a circle
+        let circle = function (x, y, radius, isFilled) {
+            ctx.beginPath()
+            ctx.arc(x, y, radius, 0, Math.PI * 2 , true)
+            if (isFilled === true) {
+                ctx.fill()
+            } else {
+                ctx.stroke()
+            }
+        }
+    
+        // The Block constructor - create a block object in (imaginary) grid
+        let Block = function (col, row) {
+            this.col = col
+            this.row = row
+        }
+            
+        // Draw a square at the block's location
+        Block.prototype.drawSquare = function (color) {
+            var x = this.col * blockSize
+            var y = this.row * blockSize
+            ctx.fillStyle = color
+            ctx.fillRect(x, y, blockSize, blockSize)
+        }
+        
+        // Draw a circle at the block's location
+        Block.prototype.drawCircle = function (color) {
+            // optional TODO: use apple image instead
+            var centerX = this.col * blockSize + blockSize / 2
+            var centerY = this.row * blockSize + blockSize / 2
+            ctx.fillStyle = color
+            circle(centerX, centerY, blockSize / 2, true)
+        }
+        
+        // Check if block is in same location as another block
+        Block.prototype.equal = function (otherBlock) {
+             return this.col === otherBlock.col && this.row === otherBlock.row
+        }
+        
+        // The Snake constructor - starts with 3-block-long snake
+        let Snake = function () {
+            this.segments = [
+                 new Block(7, 5),
+                 new Block(6, 5),
+                 new Block(5, 5)
+             ]
+           this.direction = "right"
+           this.nextDirection = "right"
+        }
+                   
+       // Set initial colors of snake
+       Snake.prototype.colors = ["Navy", "MediumBlue", "Blue"]
+
+       // Draw a square for each segment of snake's body
+       Snake.prototype.draw = function () {
+           for (var i = 0; i < this.segments.length; i++) {
+               // optional TODO: shade the snake
+               if (i < this.segments.length / 3) {
+                   this.segments[i].drawSquare(this.colors[0])
+               } else if (i < this.segments.length * 2 / 3) {
+                    this.segments[i].drawSquare(this.colors[1])
+               } else {
+                    this.segments[i].drawSquare(this.colors[2])
+               }
+           }
+       }
+                
+       // Create a new head and add it to the beginning of the snake to move the snake in its current direction
+       Snake.prototype.move = function() {
+           var head = this.segments[0]
+           var newHead
+            
+           this.direction = this.nextDirection
+           
+           if (this.direction === "right") {
+               newHead = new Block(head.col + 1, head.row)
+           } else if (this.direction === "left") {
+               newHead = new Block(head.col - 1, head.row)
+           } else if (this.direction === "down") {
+               newHead = new Block(head.col, head.row + 1)
+           } else if (this.direction === "up") {
+               newHead = new Block(head.col, head.row - 1)
+           }
+                   
+           if (this.checkCollision(newHead)) {
+               gameOver()
+               return
+           }
+                   
+           this.segments.unshift(newHead)
+                   
+           // If snake is on apple, move it and increment the score
+           if (newHead.equal(apple.position)) {
+               score++
+               apple.move()
+               
+               // If the score is higher than the high score, update the high score
+               if (score >= highScore) {
+                   highScore = score;
+                   // update the local storage with the new high score
+                   localStorage.highScore = highScore.toString();
+                   document.getElementById("highScore").innerHTML="High Score : " + highScore;
+                }
+                // Speed up game every time an apple is eaten until the animationTime is 50
+                if (animationTime > 80) {
+                    animationTime -= 5
+                }
+           } else {
+               // The snake's length dosen't change
+               this.segments.pop()
+           }
+       }
+                   
+       // Check if snake's new head has collided with the wall or itself
+       Snake.prototype.checkCollision = function(head) {
+           var rightCollision = (head.col === widthInBlocks - 1)
+           var leftCollision = (head.col === 0)
+           var bottomCollision = (head.row === heightInBlocks - 1)
+           var topCollision = (head.row === 0)
+                   
+           var wallCollision =  rightCollision || leftCollision || bottomCollision || topCollision
+           
+           var selfCollision = false
+                   for (var i = 0; i < this.segments.length; i++) {
+               if (head.equal(this.segments[i])) {
+                   selfCollision = true
+               }
+           }
+                   
+           return wallCollision || selfCollision
+       }
+                   
+       // Set snake's direction based on the keyboard
+       Snake.prototype.setDirection = function (newDirection) {
+           if (this.direction === "left" && newDirection === "right") {
+           return
+           } else if (this.direction === "right" && newDirection === "left") {
+           return
+           } else if (this.direction === "down" && newDirection === "up") {
+           return
+           } else if (this.direction === "up" && newDirection === "down") {
+           return
+           }
+       
+           this.nextDirection = newDirection
+       }
+                   
+       // The Apple constructor
+       let Apple = function () {
+           this.position = new Block(10, 10)
+       }
+
+       // Draw the apple on the canvas at it's current location
+       Apple.prototype.draw = function () {
+           this.position.drawCircle("LimeGreen")
+       }
+       
+       // Set a new random location [between the borders] for the Apple
+       Apple.prototype.move = function () {
+           var randomCol = Math.floor(Math.random() * (widthInBlocks - 2)) + 1
+           var randomRow = Math.floor(Math.random() * (heightInBlocks - 2)) + 1
+           this.position = new Block(randomCol, randomRow)
+       }
+       
+       // Create snake and apple objects
+       var snake = new Snake
+       var apple = new Apple
+                                 
+
+       var collided = false
+       // Set the interval at which the game runs
+       var animationTime = 130
+       let gameLoop = function () {
+       
+           if (collided === false) {
+           
+               ctx.clearRect(0, 0, width, height)
+               drawBorder()
+               drawScore()
+               snake.move()
+               snake.draw()
+               apple.draw()
+            
+               // When the score reaches 5, change the snake's colors
+               if (score === 5) {
+                   snake.colors = ["Blue" , "Indigo", "BlueViolet"]
+               // When the score reaches 10, change the snake's colors
+               } else if (score === 10) {
+                   snake.colors = ["Red", "Orange", "Yellow"]
+               }
+          
+               setTimeout(gameLoop, animationTime)
+           }
+       
+        
+       }
+                          
+       // Start the game
+       gameLoop()
+
+       // Convert keycodes into directions
+       let directions = {
+           37: "left",
+           38: "up",
+           39: "right",
+           40: "down"
+       }
+                   
+       // The keydown event handler - handling arrow key presses
+       $("body").keydown(function (event) {
+         var newDirection = directions[event.keyCode]
+         if (newDirection !== undefined) {
+         snake.setDirection(newDirection)
+         }
+       })
+       
+       // Restart game
+        function newGame(){
+            if (collided === true) {
+                // reset snake
+                snake.segments = [
+                     new Block(7, 5),
+                     new Block(6, 5),
+                     new Block(5, 5)
+                 ]
+                   snake.direction = "right"
+                   snake.nextDirection = "right"
+                // reset snake colors
+                snake.colors = ["Navy", "MediumBlue", "Blue"]
+                // reset score
+                let X = 0;
+                if (Radio1.checked === true) {
+                    X = 130;
+                }
+                else if (Radio2.checked === true) {
+                    X = 70;
+                }
+                else {
+                    X = 180;
+                }
+                score = 0
+                // reset animation time according to selected difficulty
+                animationTime = X
+                
+                // remove the difficulty selector elements
+                P.remove();
+                Radio.remove();
+                Radio1.remove();
+                Radio2.remove();
+                Mode.remove();
+                Mode1.remove();
+                Mode2.remove();
+                Speed.remove();
+                
+                // set collided to false (so gameLoop can run)
+                collided = false
+                // rerun game loop
+                gameLoop()
+            }
+        }
+    </script>
+</body>
+</html>
